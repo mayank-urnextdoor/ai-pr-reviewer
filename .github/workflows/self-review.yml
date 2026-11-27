@@ -1,0 +1,46 @@
+# The action reviews its own pull requests, using the dist/ from the PR
+# branch (`uses: ./`), so every change is exercised on a real PR before release.
+name: Self review
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+
+concurrency:
+  group: self-review-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    # Fork PRs get no secrets, and `uses: ./` would run the fork's dist/.
+    # Only branches pushed to this repository by collaborators are reviewed.
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    timeout-minutes: 15
+    steps:
+      # Checkout is needed only so `uses: ./` can load action.yml and dist/.
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+
+      - uses: ./
+        id: review
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          severity_threshold: medium
+          max_comments: 15
+          exclude: |
+            dist/**
+            package-lock.json
+
+      - name: Outputs
+        run: |
+          echo "findings_count=${{ steps.review.outputs.findings_count }}"
+          echo "comments_posted=${{ steps.review.outputs.comments_posted }}"
+          echo "highest_severity=${{ steps.review.outputs.highest_severity }}"
+          echo "review_id=${{ steps.review.outputs.review_id }}"
+          echo "model=${{ steps.review.outputs.model }}"
