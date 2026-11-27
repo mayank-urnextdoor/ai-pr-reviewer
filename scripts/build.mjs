@@ -1,5 +1,6 @@
 // Bundles the action into a single ESM file at dist/index.js.
 // GitHub runs that file directly, so dist/ is committed to the repository.
+import { writeFile } from "node:fs/promises";
 import { build } from "esbuild";
 
 await build({
@@ -22,3 +23,6 @@ await build({
     ].join("\n"),
   },
 });
+
+// Mark the bundle as ESM regardless of the package.json above it.
+await writeFile("dist/package.json", `${JSON.stringify({ type: "module" }, null, 2)}\n`);

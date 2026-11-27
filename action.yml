@@ -1,0 +1,92 @@
+name: "AI PR Reviewer (Claude)"
+description: "Review pull requests with Claude and post inline review comments with suggested fixes."
+author: "Mayank"
+branding:
+  icon: "message-square"
+  color: "orange"
+
+inputs:
+  anthropic_api_key:
+    description: "Anthropic API key. Pass it from a secret. If empty (e.g. on PRs from forks), the action logs a warning and skips."
+    required: false
+    default: ""
+  github_token:
+    description: "Token used to read the PR and post the review. Needs `pull-requests: write` to post; with read-only access results go to annotations and the job summary."
+    required: false
+    default: ${{ github.token }}
+  model:
+    description: "Claude model ID."
+    required: false
+    default: "claude-sonnet-5-5"
+  include:
+    description: "Glob patterns (newline or comma separated). If set, only matching files are reviewed."
+    required: false
+    default: ""
+  exclude:
+    description: "Glob patterns (newline or comma separated) of files to skip."
+    required: false
+    default: ""
+  skip_generated:
+    description: "Skip lockfiles and generated or vendored files."
+    required: false
+    default: "true"
+  max_comments:
+    description: "Maximum number of new inline comments per run (0-100). The most severe findings are kept."
+    required: false
+    default: "20"
+  severity_threshold:
+    description: "Minimum severity to post as a comment: low, medium, high or critical."
+    required: false
+    default: "medium"
+  fail_on:
+    description: "Fail the step if any finding is at or above this severity: low, medium, high, critical or none."
+    required: false
+    default: "none"
+  max_tokens_per_chunk:
+    description: "Estimated input tokens of diff per request. Larger diffs are split across requests."
+    required: false
+    default: "30000"
+  max_chunks:
+    description: "Maximum number of requests per run. Files beyond this budget are listed as not reviewed."
+    required: false
+    default: "10"
+  max_output_tokens:
+    description: "max_tokens for each request (includes the model's thinking)."
+    required: false
+    default: "16000"
+  effort:
+    description: "Optional effort level (low, medium, high, xhigh, max). Empty uses the model's default."
+    required: false
+    default: ""
+  refusal_fallback:
+    description: "Use the API's server-side fallback if the model declines a request. Turned off automatically for models that do not support it."
+    required: false
+    default: "true"
+  review_instructions:
+    description: "Extra guidance appended to the system prompt, e.g. project conventions."
+    required: false
+    default: ""
+  skip_drafts:
+    description: "Do not review draft pull requests."
+    required: false
+    default: "true"
+  dry_run:
+    description: "Run the review and write the job summary without posting to the PR."
+    required: false
+    default: "false"
+
+outputs:
+  findings_count:
+    description: "Number of valid findings anchored to the diff (including ones already posted on earlier runs)."
+  comments_posted:
+    description: "Number of new inline comments posted in this run."
+  highest_severity:
+    description: "Highest severity among findings, or `none`."
+  review_id:
+    description: "ID of the review created in this run, or empty."
+  model:
+    description: "Model that was requested."
+
+runs:
+  using: "node24"
+  main: "dist/index.js"
