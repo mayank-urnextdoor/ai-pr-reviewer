@@ -76,6 +76,8 @@ A fuller example is in [`examples/review.yml`](examples/review.yml).
 | `review_id` | ID of the review created in this run, or empty. |
 | `model` | The requested model. |
 
+When the review is skipped (no API key, a draft PR, or an unsupported event), the outputs are still set: `0`, `0`, `none`, empty, and the configured model.
+
 ## How it works
 
 ```mermaid
@@ -155,6 +157,8 @@ npm run build   # writes dist/index.js; commit it with your change
 ```
 
 Tests run offline: Octokit and the Anthropic client are stubbed. See [CONTRIBUTING.md](CONTRIBUTING.md).
+
+Pull requests to this repository also run the action on themselves from the PR branch (`uses: ./`, see [`.github/workflows/self-review.yml`](.github/workflows/self-review.yml)). Without an `ANTHROPIC_API_KEY` repository secret that job takes the no-key path: it warns and passes.
 
 ## License
 
