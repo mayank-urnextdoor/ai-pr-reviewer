@@ -118,10 +118,10 @@ Some details:
 
 Each run makes at most `max_chunks` requests of at most about `max_tokens_per_chunk` diff tokens, plus a system prompt of under 1k tokens. Each response is capped by `max_output_tokens` (thinking included). The summary comment reports the exact input and output tokens used.
 
-As a rough guide at the published `claude-sonnet-5-5` rates ($2 per million input tokens and $10 per million output tokens at the time of writing; see [pricing](https://platform.claude.com/docs/en/about-claude/pricing) for current numbers):
+As a rough guide (check [current pricing](https://platform.claude.com/docs/en/about-claude/pricing) for the model you choose):
 
-- A typical PR with a few hundred changed lines is one request of a few thousand input tokens and a few thousand output tokens: a few cents.
-- The defaults cap input at roughly 300k tokens per run (about $0.60) plus output; the theoretical worst case with every response at its cap is about $2.20 per run.
+- A typical PR with a few hundred changed lines is one request of a few thousand input tokens and a few thousand output tokens.
+- The defaults cap input at roughly 300k tokens per run, plus output capped by `max_output_tokens` per request.
 
 To spend less: narrow `include`, add `exclude` patterns, lower `max_chunks`, set `effort: low`, skip drafts (default), and use the `concurrency` block from the example so superseded pushes are cancelled.
 
