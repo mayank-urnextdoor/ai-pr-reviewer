@@ -1,0 +1,54 @@
+diff --git a/src/math.ts b/src/math.ts
+index 3b18e51..a1c2d3e 100644
+--- a/src/math.ts
++++ b/src/math.ts
+@@ -1,7 +1,9 @@
+ export function add(a: number, b: number): number {
+   return a + b;
+ }
+ 
+-export function div(a: number, b: number): number {
+-  return a / b;
++export function div(a: number, b: number): number {
++  if (b === 0) throw new RangeError("division by zero");
++  return a / b;
+ }
++
+@@ -20,3 +22,4 @@ export function mul(a: number, b: number): number {
+ export function sub(a: number, b: number): number {
+   return a - b;
+ }
++export const PI = 3.14;
+diff --git a/docs/new.md b/docs/new.md
+new file mode 100644
+index 0000000..e69de29
+--- /dev/null
++++ b/docs/new.md
+@@ -0,0 +1,2 @@
++# New doc
++Hello
+\ No newline at end of file
+diff --git a/old/legacy.js b/old/legacy.js
+deleted file mode 100644
+index 1111111..0000000
+--- a/old/legacy.js
++++ /dev/null
+@@ -1,2 +0,0 @@
+-module.exports = 1;
+--- this line starts with two dashes
+diff --git a/src/a.ts b/src/b.ts
+similarity index 90%
+rename from src/a.ts
+rename to src/b.ts
+index 2222222..3333333 100644
+--- a/src/a.ts
++++ b/src/b.ts
+@@ -1 +1 @@
+-export const name = "a";
++export const name = "b";
+diff --git a/assets/logo.png b/assets/logo.png
+index 4444444..5555555 100644
+Binary files a/assets/logo.png and b/assets/logo.png differ
+diff --git a/scripts/run.sh b/scripts/run.sh
+old mode 100644
+new mode 100755
