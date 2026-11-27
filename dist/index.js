@@ -80111,6 +80111,7 @@ async function run(env) {
 async function review(env) {
   const inputs = readInputs((name) => getInput(name));
   if (inputs.anthropicApiKey) setSecret(inputs.anthropicApiKey);
+  setOutputs(inputs, [], 0, null);
   const { context: context4 } = env;
   if (!SUPPORTED_EVENTS.has(context4.eventName)) {
     warning(`ai-pr-reviewer only runs on pull_request events; got "${context4.eventName}". Skipping.`);
@@ -80122,7 +80123,9 @@ async function review(env) {
     );
   }
   if (!inputs.anthropicApiKey) {
-    warning("No anthropic_api_key provided (secrets are not available to pull requests from forks). Skipping review.");
+    warning(
+      "No anthropic_api_key provided. Skipping review. Add an ANTHROPIC_API_KEY repository secret and pass it as `anthropic_api_key`; secrets are not available to pull requests from forks."
+    );
     return;
   }
   const number4 = context4.payload.pull_request?.number;

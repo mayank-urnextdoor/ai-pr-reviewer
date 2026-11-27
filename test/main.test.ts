@@ -164,6 +164,13 @@ describe("run", () => {
     expect(create).not.toHaveBeenCalled();
     expect(coreMock.setFailed).not.toHaveBeenCalled();
     expect(coreMock.warning).toHaveBeenCalledWith(expect.stringContaining("No anthropic_api_key"));
+    expect(outputs).toEqual({
+      findings_count: 0,
+      comments_posted: 0,
+      highest_severity: "none",
+      review_id: "",
+      model: "claude-sonnet-5-5",
+    });
   });
 
   it("skips unsupported events and drafts", async () => {
@@ -174,6 +181,7 @@ describe("run", () => {
     const draft = setup({ octokit: { draft: true } });
     await run(draft.env);
     expect(draft.create).not.toHaveBeenCalled();
+    expect(outputs).toMatchObject({ findings_count: 0, highest_severity: "none" });
   });
 
   it("reports a failed request in the summary and fails only if every request failed", async () => {

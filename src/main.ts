@@ -34,6 +34,9 @@ async function review(env: Environment): Promise<void> {
   const inputs = readInputs((name) => core.getInput(name));
   // Register the key as a secret before anything can log it.
   if (inputs.anthropicApiKey) core.setSecret(inputs.anthropicApiKey);
+  // Defaults for runs that skip (no key, draft, other event), so later steps
+  // always see the documented values instead of empty strings.
+  setOutputs(inputs, [], 0, null);
 
   const { context } = env;
   if (!SUPPORTED_EVENTS.has(context.eventName)) {
@@ -48,7 +51,10 @@ async function review(env: Environment): Promise<void> {
   }
   if (!inputs.anthropicApiKey) {
     // Typical for PRs from forks: secrets are not passed to pull_request runs.
-    core.warning("No anthropic_api_key provided (secrets are not available to pull requests from forks). Skipping review.");
+    core.warning(
+      "No anthropic_api_key provided. Skipping review. Add an ANTHROPIC_API_KEY repository secret and pass it as " +
+        "`anthropic_api_key`; secrets are not available to pull requests from forks.",
+    );
     return;
   }
   const number = context.payload.pull_request?.number;
