@@ -1,0 +1,38 @@
+# Copy to .github/workflows/review.yml in your repository and add an
+# ANTHROPIC_API_KEY repository secret.
+name: AI review
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+
+# A newer push supersedes an in-flight review of the same PR.
+concurrency:
+  group: ai-review-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pull-requests: write # to post the review; without it, results go to annotations
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    # Secrets are not available to PRs from forks; the action would skip anyway.
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    timeout-minutes: 15
+    steps:
+      # No checkout needed: the action reads the diff through the GitHub API
+      # and never runs code from the pull request.
+      - uses: mayank-urnextdoor/ai-pr-reviewer@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          # model: claude-sonnet-5-5
+          severity_threshold: medium
+          max_comments: 15
+          fail_on: none
+          exclude: |
+            **/*.md
+            **/fixtures/**
+          review_instructions: |
+            We use zod for all input validation at API boundaries.
